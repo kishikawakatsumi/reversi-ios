@@ -26,11 +26,11 @@ class GameManager {
     private var players: [Player] = [.manual, .manual]
     private var playerCancellers: [Disk: Canceller] = [:]
 
+    private var defaultSavePath: URL { FileManager().urls(for: .libraryDirectory, in: .userDomainMask)[0].appendingPathComponent("Game") }
+    
     init(boardView: BoardView) {
         self.boardView = boardView
     }
-
-    private var path: URL { FileManager().urls(for: .libraryDirectory, in: .userDomainMask)[0].appendingPathComponent("Game") }
 
     /// ゲームの状態を初期化し、新しいゲームを開始します。
     func newGame() {
@@ -50,6 +50,10 @@ class GameManager {
 
     /// ゲームの状態をファイルに書き出し、保存します。
     func saveGame() throws {
+        try saveGame(path: defaultSavePath)
+    }
+
+    func saveGame(path: URL) throws {
         var output: String = ""
         output += turn.symbol
         for side in Disk.sides {
@@ -73,6 +77,10 @@ class GameManager {
 
     /// ゲームの状態をファイルから読み込み、復元します。
     func loadGame() throws {
+        try loadGame(path: defaultSavePath)
+    }
+
+    func loadGame(path: URL) throws {
         let input = try String(contentsOf: path, encoding: .utf8)
         var lines: ArraySlice<Substring> = input.split(separator: "\n")[...]
 
